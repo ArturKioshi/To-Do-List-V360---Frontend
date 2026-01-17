@@ -28,7 +28,7 @@ export function SideBar({ activeTodoListId, onTodoListSelect }: SideBarProps) {
 
     if (isLoading) {
         return (
-            <div className="w-64 bg-(--color-background) h-screen flex flex-col border-r border-gray-200 items-center justify-center">
+            <div className="w-64 bg-white h-screen flex flex-col border-r border-gray-200 items-center justify-center">
                 <p className="text-(--color-headline)">Carregando...</p>
             </div>
         );
@@ -36,14 +36,14 @@ export function SideBar({ activeTodoListId, onTodoListSelect }: SideBarProps) {
 
     if (isError) {
         return (
-            <div className="w-64 bg-(--color-background) h-screen flex flex-col border-r border-gray-200 items-center justify-center">
+            <div className="w-64 bg-white h-screen flex flex-col border-r border-gray-200 items-center justify-center">
                 <p className="text-red-500">Erro ao carregar listas</p>
             </div>
         );
     }
 
   return (
-    <div className="w-64 bg-(--color-background) h-screen flex flex-col border-r border-gray-200">
+    <div className="w-64 bg-white h-screen flex flex-col border-r border-gray-200">
       {/* Logo */}
       <div className="p-6">
         <div className="flex items-center gap-2">
