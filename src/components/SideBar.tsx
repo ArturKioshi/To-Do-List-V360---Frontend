@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useTodoLists } from '../hooks/useTodoLists';
-import { ClipboardText, PlusCircle  } from 'phosphor-react';
+import { ClipboardText, PlusCircle } from 'phosphor-react';
 import { SideBarItem } from './SideBarItem';
 import { CreateTodoListModal } from './CreateTodoListModal';
+import { Button } from './Button';
 
 interface SideBarProps {
   activeTodoListId?: number;
@@ -65,15 +66,14 @@ export function SideBar({ activeTodoListId, onTodoListSelect }: SideBarProps) {
         ))}
       </nav>
 
-      {/* New List Button */}
-      <div className="p-4 w-full">
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="w-full bg-(--color-button) text-(--color-button-text) py-3 px-4 rounded-lg font-medium flex items-center justify-center gap-2 hover:opacity-90 transition-opacity hover:cursor-pointer"
-        >
-          <PlusCircle size={24} />
-          <span>Nova Lista</span>
-        </button>
+      {/* Button */}
+      <div className='p-3'>
+        <Button onClick={() => setIsModalOpen(true)} >
+          <div className='flex gap-1 justify-center items-center'>
+            <PlusCircle size={24} />
+            <span>Nova Lista</span>
+          </div>
+        </Button>
       </div>
 
       <CreateTodoListModal

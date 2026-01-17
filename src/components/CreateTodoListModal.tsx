@@ -1,6 +1,7 @@
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { X } from 'phosphor-react';
 import { useState } from 'react';
+import { Button } from './Button';
 
 interface CreateTodoListModalProps {
   isOpen: boolean;
@@ -90,21 +91,21 @@ export function CreateTodoListModal({ isOpen, onClose, onCreate }: CreateTodoLis
             </div>
 
             <div className="flex gap-3 pt-4">
-              <button
+              <Button
                 type="button"
                 onClick={handleClose}
                 disabled={isLoading}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-medium text-(--color-headline) hover:bg-gray-50 transition-colors disabled:opacity-50 hover:cursor-pointer"
+                variant="cancel"
               >
                 Cancelar
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
+                onClick={() => null}
                 disabled={isLoading || !title.trim()}
-                className="flex-1 px-4 py-2 bg-(--color-button) text-(--color-button-text) rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50 hover:cursor-pointer disabled:cursor-not-allowed"
               >
                 {isLoading ? 'Criando...' : 'Criar Lista'}
-              </button>
+              </Button>
             </div>
           </form>
         </DialogPanel>
