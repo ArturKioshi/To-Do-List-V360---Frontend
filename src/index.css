@@ -14,6 +14,10 @@
   --color-highlight: #ff6e6c;
   --color-secondary: #67568c;
   --color-tertiary: #fbdd74;
+
+  /* Font Sizes */
+  --font-size-xs: 0.5rem;     /* 8px */
+  
 }
 
 :root {
