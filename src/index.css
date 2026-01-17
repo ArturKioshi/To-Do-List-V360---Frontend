@@ -1,3 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+  /* Elements */
+  --color-background: #FFFFFF;
+  --color-headline: #1f1235;
+  --color-subheadline: #1b1425;
+  --color-button: #ff6e6c;
+  --color-button-text: #1f1235;
+
+  /* Illustration */
+  --color-stroke: #1f1235;
+  --color-main: #FFFFFF;
+  --color-highlight: #ff6e6c;
+  --color-secondary: #67568c;
+  --color-tertiary: #fbdd74;
+}
+
 :root {
   margin: 0;
   padding: 0;
