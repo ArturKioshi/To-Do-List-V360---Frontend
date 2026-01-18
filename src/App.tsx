@@ -3,14 +3,16 @@ import { SideBar } from './components/SideBar';
 import { useTodoLists } from './hooks/useTodoLists';
 import { useTodoItems } from './hooks/useTodoItems';
 import { Button } from './components/Button';
-import { PlusCircle } from 'phosphor-react';
+import { PlusCircle, List } from 'phosphor-react';
 import { TodoItemCard } from './components/TodoItemCard';
 import { CreateTodoItemModal } from './components/CreateTodoItemModal';
 import type { CreateTodoItemParams } from './dtos/todoItem';
+import { ClassMerge } from './utils/ClassMerge';
 
 export function App() {
     const [activeTodoListId, setActiveTodoListId] = useState<number | undefined>();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const { todoLists } = useTodoLists();
     const { items, isLoading, isError, completItem, deleteItem, createItem } = useTodoItems(activeTodoListId ?? null);
 
@@ -35,13 +37,40 @@ export function App() {
     }
 
     return (
-        <div className="flex h-full">
-            <SideBar 
-                activeTodoListId={activeTodoListId}
-                onTodoListSelect={setActiveTodoListId}
-            />
-            <main className="flex-1 bg-background ">
-                <div className="p-8">
+        <div className="flex h-full relative">
+            {/* Backdrop mobile */}
+            {isSidebarOpen && (
+                <div 
+                    className="fixed inset-0 bg-black/30 z-40 lg:hidden"
+                    onClick={() => setIsSidebarOpen(false)}
+                />
+            )}
+
+            {/* Sidebar */}
+            <div className={ClassMerge("fixed lg:relative inset-y-0 left-0 z-50 lg:z-auto transition-transform duration-300 lg:translate-x-0",  
+                isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+            )}>
+                <SideBar 
+                    activeTodoListId={activeTodoListId}
+                    onTodoListSelect={(id) => {
+                        setActiveTodoListId(id);
+                        setIsSidebarOpen(false);
+                    }}
+                />
+            </div>
+
+            <main className="flex-1 bg-background">
+                {/* Button to open sidebar */}
+                <div className="lg:hidden p-4">
+                    <button
+                        onClick={() => setIsSidebarOpen(true)}
+                        className="p-2 hover:bg-gray-100 rounded transition-colors hover:cursor-pointer"
+                    >
+                        <List size={24} className="text-headline" />
+                    </button>
+                </div>
+
+                <div className="p-4 lg:p-8">
                     <h1 className="text-4xl font-bold mb-3 text-headline">V360 Todo App</h1>
                     {activeTodoListId && (
                         <div className='text-black border-t-2 border-headline'>
