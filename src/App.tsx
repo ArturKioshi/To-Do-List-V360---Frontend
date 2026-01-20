@@ -5,8 +5,8 @@ import { useTodoItems } from './hooks/useTodoItems';
 import { Button } from './components/Button';
 import { PlusCircle, List } from 'phosphor-react';
 import { TodoItemCard } from './components/TodoItemCard';
-import { CreateTodoItemModal } from './components/CreateTodoItemModal';
-import type { CreateTodoItemParams } from './dtos/todoItem';
+import { CreateOrUpdateTodoItemModal } from './components/CreateOrEditTodoItemModal';
+import type { CreateTodoItemParams, TodoItemAPIResponse } from './dtos/todoItem';
 import { ClassMerge } from './utils/ClassMerge';
 import { PencilSimple } from 'phosphor-react';
 import { CreateOrEditTodoListModal } from './components/CreateOrEditTodoListModal';
@@ -16,8 +16,9 @@ export function App() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isEditListModalOpen, setIsEditListModalOpen] = useState(false);
+    const [editingItem, setEditingItem] = useState<TodoItemAPIResponse | undefined>();
     const { todoLists } = useTodoLists();
-    const { items, isLoading, isError, completItem, deleteItem, createItem } = useTodoItems(activeTodoListId ?? null);
+    const { items, isLoading, isError, completItem, deleteItem, createItem, updateItem } = useTodoItems(activeTodoListId ?? null);
     const { createTodoList,updateTodoList } = useTodoLists();
 
     const list = todoLists.find(list => list.id === activeTodoListId);
@@ -38,6 +39,10 @@ export function App() {
 
     const handleCreateItem = async (data: CreateTodoItemParams) => {
         await createItem(data);
+    }
+
+    const handleUpdateItem = async (id: number, data: CreateTodoItemParams) => {
+        await updateItem({ itemId: id, data });
     }
 
     const handleCreateList = async (title: string, description?: string) => {
@@ -138,6 +143,10 @@ export function App() {
                                                 item={item}
                                                 onToggleComplete={handleToggleComplete}
                                                 onDelete={handleDeleteItem}
+                                                onEdit={(item) => {
+                                                    setEditingItem(item);
+                                                    setIsModalOpen(true);
+                                                }}
                                             />
                                         ))}
                                     </div>
@@ -152,10 +161,15 @@ export function App() {
                                 onUpdate={handleUpdateList}
                             />
 
-                            <CreateTodoItemModal 
+                            <CreateOrUpdateTodoItemModal 
                                 isOpen={isModalOpen}
-                                onClose={() => setIsModalOpen(false)}
+                                onClose={() => {
+                                    setIsModalOpen(false);
+                                    setEditingItem(undefined);
+                                }}
                                 onCreate={handleCreateItem}
+                                todoItem={editingItem}
+                                onUpdate={handleUpdateItem}
                             />
                         </div>
                     )}

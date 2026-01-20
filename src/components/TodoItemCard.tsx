@@ -1,4 +1,4 @@
-import { CalendarBlank, Flag, Trash } from 'phosphor-react';
+import { CalendarBlank, Flag, Trash, PencilSimple } from 'phosphor-react';
 import type { TodoItemAPIResponse } from '../dtos/todoItem';
 import { ClassMerge } from '../utils/ClassMerge';
 import { formatDate } from '../utils/dateUtils';
@@ -7,6 +7,7 @@ interface TodoItemCardProps {
   item: TodoItemAPIResponse;
   onToggleComplete?: (id: number) => void;
   onDelete?: (id: number) => void;
+  onEdit?: (item: TodoItemAPIResponse) => void;
 }
 
 const priorityColors = {
@@ -21,7 +22,7 @@ const priorityLabels = {
   3: 'Alta',
 };
 
-export function TodoItemCard({ item, onToggleComplete, onDelete }: TodoItemCardProps) {
+export function TodoItemCard({ item, onToggleComplete, onDelete, onEdit }: TodoItemCardProps) {
 
   function handleToggleComplete(e: React.MouseEvent) {
     e.stopPropagation();
@@ -33,6 +34,11 @@ export function TodoItemCard({ item, onToggleComplete, onDelete }: TodoItemCardP
     if (window.confirm('Tem certeza que deseja excluir esta tarefa?')) {
       onDelete?.(item.id);
     }
+  }
+
+  function handleEdit(e: React.MouseEvent) {
+    e.stopPropagation();
+    onEdit?.(item);
   }
 
   return (
@@ -90,14 +96,24 @@ export function TodoItemCard({ item, onToggleComplete, onDelete }: TodoItemCardP
           </div>
         </div>
 
-        {/* Delete Button */}
-        <button
-          onClick={handleDelete}
-          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-red-500/10 rounded hover:cursor-pointer"
-          title="Excluir tarefa"
-        >
-          <Trash size={24} className="text-red-500" />
-        </button>
+        {/* Edit and Delete Buttons */}
+        <div className="flex gap-1">
+          <button
+            onClick={handleEdit}
+            className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-100 rounded hover:cursor-pointer"
+            title="Editar tarefa"
+          >
+            <PencilSimple size={24} className="text-elements-headline" />
+          </button>
+
+          <button
+            onClick={handleDelete}
+            className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-red-500/10 rounded hover:cursor-pointer"
+            title="Excluir tarefa"
+          >
+            <Trash size={24} className="text-red-500" />
+          </button>
+        </div>
       </div>
     </div>
   );
