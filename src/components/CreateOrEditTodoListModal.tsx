@@ -1,18 +1,33 @@
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { X } from 'phosphor-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from './Button';
+import type { TodoListAPIResponse } from '../dtos/todoList';
 
-interface CreateTodoListModalProps {
+interface CreateOrEditTodoListModalProps {
   isOpen: boolean;
   onClose: () => void;
   onCreate: (title: string, description?: string) => Promise<void>;
+  onUpdate?: (id: number, title: string, description?: string) => Promise<void>;
+  todoList?: TodoListAPIResponse;
 }
 
-export function CreateTodoListModal({ isOpen, onClose, onCreate }: CreateTodoListModalProps) {
+export function CreateOrEditTodoListModal({ isOpen, onClose, onCreate, onUpdate, todoList }: CreateOrEditTodoListModalProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const isEditMode = !!todoList;
+
+  useEffect(() => {
+    if (todoList) {
+      setTitle(todoList.title);
+      setDescription(todoList.description || '');
+    } else {
+      setTitle('');
+      setDescription('');
+    }
+  }, [todoList, isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,12 +35,16 @@ export function CreateTodoListModal({ isOpen, onClose, onCreate }: CreateTodoLis
 
     setIsLoading(true);
     try {
-      await onCreate(title, description || undefined);
+      if (isEditMode && onUpdate && todoList) {
+        await onUpdate(todoList.id, title, description || undefined);
+      } else {
+        await onCreate(title, description || undefined);
+      }
       setTitle('');
       setDescription('');
       onClose();
     } catch (error) {
-      console.error('Erro ao criar lista:', error);
+      console.error(`Erro ao ${isEditMode ? 'atualizar' : 'criar'} lista:`, error);
     } finally {
       setIsLoading(false);
     }
@@ -47,7 +66,7 @@ export function CreateTodoListModal({ isOpen, onClose, onCreate }: CreateTodoLis
         <DialogPanel className="w-full max-w-md bg-white rounded-xl shadow-xl">
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <DialogTitle className="text-xl font-bold text-(--color-headline)">
-              Nova Lista de Tarefas
+              {isEditMode ? 'Editar Lista de Tarefas' : 'Nova Lista de Tarefas'}
             </DialogTitle>
             <button
               onClick={handleClose}
@@ -104,7 +123,10 @@ export function CreateTodoListModal({ isOpen, onClose, onCreate }: CreateTodoLis
                 onClick={() => null}
                 disabled={isLoading || !title.trim()}
               >
-                {isLoading ? 'Criando...' : 'Criar Lista'}
+                {isLoading 
+                  ? (isEditMode ? 'Atualizando...' : 'Criando...') 
+                  : (isEditMode ? 'Atualizar Lista' : 'Criar Lista')
+                }
               </Button>
             </div>
           </form>

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTodoLists } from '../hooks/useTodoLists';
 import { ClipboardText, PlusCircle } from 'phosphor-react';
 import { SideBarItem } from './SideBarItem';
-import { CreateTodoListModal } from './CreateTodoListModal';
+import { CreateOrEditTodoListModal } from './CreateOrEditTodoListModal';
 import { Button } from './Button';
 
 interface SideBarProps {
@@ -76,7 +76,7 @@ export function SideBar({ activeTodoListId, onTodoListSelect }: SideBarProps) {
         </Button>
       </div>
 
-      <CreateTodoListModal
+      <CreateOrEditTodoListModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onCreate={handleCreateList}
