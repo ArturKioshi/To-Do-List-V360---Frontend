@@ -8,13 +8,17 @@ import { TodoItemCard } from './components/TodoItemCard';
 import { CreateTodoItemModal } from './components/CreateTodoItemModal';
 import type { CreateTodoItemParams } from './dtos/todoItem';
 import { ClassMerge } from './utils/ClassMerge';
+import { PencilSimple } from 'phosphor-react';
+import { CreateOrEditTodoListModal } from './components/CreateOrEditTodoListModal';
 
 export function App() {
     const [activeTodoListId, setActiveTodoListId] = useState<number | undefined>();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isEditListModalOpen, setIsEditListModalOpen] = useState(false);
     const { todoLists } = useTodoLists();
     const { items, isLoading, isError, completItem, deleteItem, createItem } = useTodoItems(activeTodoListId ?? null);
+    const { createTodoList,updateTodoList } = useTodoLists();
 
     const list = todoLists.find(list => list.id === activeTodoListId);
 
@@ -34,6 +38,14 @@ export function App() {
 
     const handleCreateItem = async (data: CreateTodoItemParams) => {
         await createItem(data);
+    }
+
+    const handleCreateList = async (title: string, description?: string) => {
+        await createTodoList({ title, description });
+    }
+
+    const handleUpdateList = async (id: number, title: string, description?: string) => {
+        await updateTodoList({ id, data: { title, description } });
     }
 
     return (
@@ -74,8 +86,14 @@ export function App() {
                     <h1 className="text-4xl font-bold mb-3 text-headline">V360 Todo App</h1>
                     {activeTodoListId && (
                         <div className='text-black border-t-2 border-headline'>
-                            <h2 className='text-2xl font-semibold pt-2'>
+                            <h2 className='text-2xl font-semibold pt-2 flex items-center gap-0.5'>
                                 {list?.title}
+                                <button
+                                    onClick={() => setIsEditListModalOpen(true)}
+                                    className="p-1 hover:bg-gray-100 rounded transition-colors hover:cursor-pointer"
+                                >
+                                    <PencilSimple size={20} />
+                                </button>
                             </h2> 
                             <h3 className='text-black'>
                                 {list?.description}
@@ -125,6 +143,14 @@ export function App() {
                                     </div>
                                 </div>
                             )}
+
+                            <CreateOrEditTodoListModal 
+                                isOpen={isEditListModalOpen}
+                                onClose={() => setIsEditListModalOpen(false)}
+                                onCreate={handleCreateList}
+                                todoList={list}
+                                onUpdate={handleUpdateList}
+                            />
 
                             <CreateTodoItemModal 
                                 isOpen={isModalOpen}
