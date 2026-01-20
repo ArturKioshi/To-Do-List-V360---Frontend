@@ -1,21 +1,39 @@
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { X } from 'phosphor-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from './Button';
-import type { CreateTodoItemParams } from '../dtos/todoItem';
+import type { CreateTodoItemParams, TodoItemAPIResponse } from '../dtos/todoItem';
 
 interface CreateTodoItemModalProps {
   isOpen: boolean;
   onClose: () => void;
   onCreate: (data: CreateTodoItemParams) => Promise<void>;
+  todoItem?: TodoItemAPIResponse;
+  onUpdate?: (id: number, data: CreateTodoItemParams) => Promise<void>;
 }
 
-export function CreateTodoItemModal({ isOpen, onClose, onCreate }: CreateTodoItemModalProps) {
+export function CreateOrUpdateTodoItemModal({ isOpen, onClose, onCreate, todoItem, onUpdate }: CreateTodoItemModalProps) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [priority, setPriority] = useState<number>(2);
   const [dueDate, setDueDate] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const isEditMode = !!todoItem;
+
+  useEffect(() => {
+    if (todoItem) {
+      setTitle(todoItem.title);
+      setContent(todoItem.content || '');
+      setPriority(todoItem.priority);
+      setDueDate(todoItem.due_date || '');
+    } else {
+      setTitle('');
+      setContent('');
+      setPriority(2);
+      setDueDate('');
+    }
+  }, [todoItem, isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,20 +41,26 @@ export function CreateTodoItemModal({ isOpen, onClose, onCreate }: CreateTodoIte
 
     setIsLoading(true);
     try {
-      await onCreate({
+      const data: CreateTodoItemParams = {
         title,
         content: content || undefined,
         priority,
         due_date: dueDate || null,
-      });
-      // Reset form
+      };
+
+      if (isEditMode && onUpdate && todoItem) {
+        await onUpdate(todoItem.id, data);
+      } else {
+        await onCreate(data);
+      }
+      
       setTitle('');
       setContent('');
       setPriority(2);
       setDueDate('');
       onClose();
     } catch (error) {
-      console.error('Erro ao criar tarefa:', error);
+      console.error(`Erro ao ${isEditMode ? 'atualizar' : 'criar'} tarefa:`, error);
     } finally {
       setIsLoading(false);
     }
@@ -60,7 +84,7 @@ export function CreateTodoItemModal({ isOpen, onClose, onCreate }: CreateTodoIte
         <DialogPanel className="w-full max-w-md bg-white rounded-xl shadow-xl">
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <DialogTitle className="text-xl font-bold text-(--color-headline)">
-              Nova Tarefa
+              {isEditMode ? 'Editar Tarefa' : 'Nova Tarefa'}
             </DialogTitle>
             <button
               onClick={handleClose}
@@ -148,7 +172,7 @@ export function CreateTodoItemModal({ isOpen, onClose, onCreate }: CreateTodoIte
                 onClick={() => null}
                 disabled={isLoading || !title.trim()}
               >
-                {isLoading ? 'Criando...' : 'Criar Tarefa'}
+                {isLoading ? (isEditMode ? 'Atualizando...' : 'Criando...') : (isEditMode ? 'Atualizar Tarefa' : 'Criar Tarefa')}
               </Button>
             </div>
           </form>
